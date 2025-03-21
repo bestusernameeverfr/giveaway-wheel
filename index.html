@@ -19,6 +19,12 @@
             flex-direction: column;
             align-items: center;
         }
+        .winner-message {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
         .box {
             width: 300px;
             height: 100px;
@@ -68,6 +74,7 @@
 </head>
 <body>
     <div class="container">
+        <div class="winner-message" id="winner-message"></div>
         <div class="box" id="username-box">No Usernames</div>
         <div class="button-container">
             <input type="text" id="username-input" class="input-box" placeholder="Enter username" />
@@ -132,7 +139,9 @@
                     clearInterval(rollInterval);
                     isRolling = false;
                     // Pick the last randomly displayed username as the winner
-                    document.getElementById('username-box').innerText = usernames[randomIndex];
+                    let winner = usernames[randomIndex];
+                    document.getElementById('username-box').innerText = winner;
+                    document.getElementById('winner-message').innerText = `${winner} won!`;
                 }
             }, rollDuration);
         }

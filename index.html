@@ -28,6 +28,8 @@
             align-items: center;
             margin-bottom: 20px;
             background-color: white;
+            font-size: 24px;
+            font-weight: bold;
         }
         .button-container {
             display: flex;
@@ -69,7 +71,7 @@
         <div class="box" id="username-box">No Usernames</div>
         <div class="button-container">
             <input type="text" id="username-input" class="input-box" placeholder="Enter username" />
-            <button class="roll-btn" onclick="rollUsername()">Roll</button>
+            <button class="roll-btn" onclick="startRolling()">Roll</button>
         </div>
         <div class="stats">
             <span id="username-count">0</span> Usernames Entered
@@ -79,6 +81,8 @@
 
     <script>
         let usernames = [];
+        let rollInterval;
+        let isRolling = false;
 
         // Handle username input and submission on Enter key
         document.getElementById('username-input').addEventListener('keypress', function(event) {
@@ -110,12 +114,27 @@
             listElement.innerHTML = usernames.map(username => `<div>${username}</div>`).join('');
         }
 
-        // Function to roll/select a random username
-        function rollUsername() {
-            if (usernames.length > 0) {
+        // Function to start the "rolling" of usernames
+        function startRolling() {
+            if (usernames.length === 0 || isRolling) return;
+            
+            isRolling = true;
+            let rollTime = 5000; // 5 seconds
+            let rollDuration = 50; // How fast to switch between usernames (milliseconds)
+            let startTime = Date.now();
+
+            rollInterval = setInterval(() => {
                 let randomIndex = Math.floor(Math.random() * usernames.length);
                 document.getElementById('username-box').innerText = usernames[randomIndex];
-            }
+
+                // Stop the rolling after 5 seconds
+                if (Date.now() - startTime >= rollTime) {
+                    clearInterval(rollInterval);
+                    isRolling = false;
+                    // Pick the last randomly displayed username as the winner
+                    document.getElementById('username-box').innerText = usernames[randomIndex];
+                }
+            }, rollDuration);
         }
     </script>
 </body>

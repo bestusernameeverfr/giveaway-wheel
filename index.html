@@ -41,12 +41,12 @@
     <script>
         const canvas = document.getElementById("wheel");
         const ctx = canvas.getContext("2d");
-        let users = [];
+        let users = ["", "", "", ""]; // Start with 4 empty slots
         let rotation = 0;
         let spinning = false;
 
         function drawWheel() {
-            const sections = users.length || 1;
+            const sections = users.length;
             const arc = (2 * Math.PI) / sections;
 
             for (let i = 0; i < sections; i++) {
@@ -70,7 +70,7 @@
         }
 
         function spinWheel() {
-            if (spinning || users.length === 0) return;
+            if (spinning || users.every(name => name === "")) return;
             spinning = true;
             let angle = 0;
             const spinSpeed = Math.random() * 10 + 10;
@@ -100,7 +100,14 @@
         function addUser() {
             const input = document.getElementById("username");
             if (input.value.trim()) {
-                users.push(input.value.trim());
+                // Replace first empty slot or add new section
+                const emptyIndex = users.indexOf("");
+                if (emptyIndex !== -1) {
+                    users[emptyIndex] = input.value.trim();
+                } else {
+                    users.push(input.value.trim());
+                }
+
                 input.value = "";
                 drawWheel();
             }

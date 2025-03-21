@@ -27,7 +27,7 @@
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
             border-top: 20px solid red;
-            margin-bottom: -5px; /* Adjusted for proper positioning */
+            margin-bottom: -5px;
         }
 
         canvas {
@@ -90,30 +90,34 @@
         function spinWheel() {
             if (spinning || users.every(name => name === "")) return;
             spinning = true;
-            let spinSpeed = Math.random() * 15 + 10; // Initial speed
-            const deceleration = 0.99; // Slow down factor
-            let spinDuration = 14000; // Spin for 14 seconds
-            let startTime = null;
+            let spinSpeed = 30; // Initial fast spin
+            let spinTime = 0;
+            const maxSpinTime = 14000; // 14 seconds
+            const slowDownTime = 4000; // Last 4 seconds for slowing down
 
             function animate(timestamp) {
-                if (!startTime) startTime = timestamp;
-                let elapsed = timestamp - startTime;
+                if (!spinTime) spinTime = timestamp;
+                let elapsed = timestamp - spinTime;
 
-                if (elapsed < spinDuration) {
-                    spinSpeed *= deceleration;
+                if (elapsed < maxSpinTime - slowDownTime) {
+                    rotation += spinSpeed; // Keep constant speed
+                } else if (elapsed < maxSpinTime) {
+                    spinSpeed *= 0.97; // Gradually slow down
                     rotation += spinSpeed;
-                    ctx.clearRect(0, 0, 300, 300);
-                    ctx.save();
-                    ctx.translate(150, 150);
-                    ctx.rotate(rotation * Math.PI / 180);
-                    ctx.translate(-150, -150);
-                    drawWheel();
-                    ctx.restore();
-                    requestAnimationFrame(animate);
                 } else {
                     spinning = false;
                     pickWinner();
+                    return;
                 }
+
+                ctx.clearRect(0, 0, 300, 300);
+                ctx.save();
+                ctx.translate(150, 150);
+                ctx.rotate(rotation * Math.PI / 180);
+                ctx.translate(-150, -150);
+                drawWheel();
+                ctx.restore();
+                requestAnimationFrame(animate);
             }
 
             requestAnimationFrame(animate);

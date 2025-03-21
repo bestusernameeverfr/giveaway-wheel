@@ -20,18 +20,6 @@
             margin-bottom: 10px;
         }
 
-        /* Arrow now correctly pointing downward */
-        #arrow {
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-bottom: 20px solid red;  /* Arrow pointing down */
-            margin-bottom: -5px;
-            position: absolute;
-            top: 90px;
-        }
-
         canvas {
             border-radius: 50%;
         }
@@ -50,7 +38,6 @@
 </head>
 <body>
     <div id="winnerDisplay">Spin the wheel!</div>
-    <div id="arrow"></div>
     <canvas id="wheel" width="300" height="300"></canvas>
     <div id="controls">
         <input type="text" id="username" placeholder="Enter username">
@@ -131,7 +118,7 @@
             let currentRotation = (rotation * Math.PI / 180) % (2 * Math.PI);
             if (currentRotation < 0) currentRotation += 2 * Math.PI;
 
-            // Calculate the section the arrow is pointing to
+            // Calculate the section the wheel stops at
             let winningIndex = Math.floor(((Math.PI / 2) - currentRotation) / arc) % sections;
             if (winningIndex < 0) winningIndex += sections; // Fix negative index
             let winner = users[winningIndex] || "No name";

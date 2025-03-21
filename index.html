@@ -20,14 +20,15 @@
             margin-bottom: 10px;
         }
 
-        /* Arrow now pointing DOWNWARD */
+        /* Arrow now correctly pointing downward */
         #arrow {
             width: 0;
             height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
             border-top: 20px solid red;
-            margin-bottom: -5px;
+            position: absolute;
+            top: 90px;
         }
 
         canvas {
@@ -129,8 +130,11 @@
             let currentRotation = (rotation * Math.PI / 180) % (2 * Math.PI);
             if (currentRotation < 0) currentRotation += 2 * Math.PI;
 
-            let winningIndex = Math.floor((2 * Math.PI - currentRotation) / arc) % sections;
+            // Calculate the winning section based on the arrow position
+            let winningIndex = Math.floor(((Math.PI / 2) - currentRotation) / arc) % sections;
+            if (winningIndex < 0) winningIndex += sections; // Fix negative index
             let winner = users[winningIndex] || "No name";
+
             document.getElementById("winnerDisplay").innerText = `Winner: ${winner}`;
         }
 

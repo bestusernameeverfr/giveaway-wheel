@@ -131,8 +131,8 @@
             let currentRotation = (rotation * Math.PI / 180) % (2 * Math.PI);
             if (currentRotation < 0) currentRotation += 2 * Math.PI;
 
-            // Calculate the section the wheel stops at
-            let winningIndex = Math.floor(((Math.PI / 2) - currentRotation) / arc) % sections;
+            // Calculate the section on top of the wheel
+            let winningIndex = Math.floor((currentRotation - Math.PI / 2) / arc) % sections;
             if (winningIndex < 0) winningIndex += sections; // Fix negative index
             let winner = users[winningIndex] || "No name";
 

@@ -20,13 +20,14 @@
             margin-bottom: 10px;
         }
 
+        /* Arrow now pointing DOWNWARD */
         #arrow {
             width: 0;
             height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-bottom: 20px solid red;
-            margin-bottom: 5px;
+            border-top: 20px solid red;
+            margin-bottom: -5px; /* Adjusted for proper positioning */
         }
 
         canvas {
@@ -91,7 +92,7 @@
             spinning = true;
             let spinSpeed = Math.random() * 15 + 10; // Initial speed
             const deceleration = 0.99; // Slow down factor
-            let spinDuration = 5000; // Spin for 5 seconds
+            let spinDuration = 14000; // Spin for 14 seconds
             let startTime = null;
 
             function animate(timestamp) {

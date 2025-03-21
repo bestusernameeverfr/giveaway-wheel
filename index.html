@@ -89,20 +89,18 @@
         function spinWheel() {
             if (spinning || users.every(name => name === "")) return;
             spinning = true;
-            let angle = 0;
-            let spinSpeed = Math.random() * 10 + 10;
-            const deceleration = 0.98;
-            let spinTime = 0;
-            const maxSpinTime = 5000; // 5 seconds
+            let spinSpeed = Math.random() * 15 + 10; // Initial speed
+            const deceleration = 0.99; // Slow down factor
+            let spinDuration = 5000; // Spin for 5 seconds
+            let startTime = null;
 
             function animate(timestamp) {
-                if (!spinTime) spinTime = timestamp;
-                let elapsed = timestamp - spinTime;
+                if (!startTime) startTime = timestamp;
+                let elapsed = timestamp - startTime;
 
-                if (elapsed < maxSpinTime) {
+                if (elapsed < spinDuration) {
                     spinSpeed *= deceleration;
-                    angle += spinSpeed;
-                    rotation += angle;
+                    rotation += spinSpeed;
                     ctx.clearRect(0, 0, 300, 300);
                     ctx.save();
                     ctx.translate(150, 150);
@@ -112,7 +110,6 @@
                     ctx.restore();
                     requestAnimationFrame(animate);
                 } else {
-                    // Stop spinning and pick a winner
                     spinning = false;
                     pickWinner();
                 }

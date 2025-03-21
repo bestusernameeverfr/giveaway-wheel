@@ -20,6 +20,18 @@
             margin-bottom: 10px;
         }
 
+        /* Arrow now positioned at the bottom */
+        #arrow {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 20px solid red;  /* Arrow pointing upwards (positioned at bottom) */
+            margin-top: -5px;
+            position: absolute;
+            top: 270px; /* Bottom of the wheel */
+        }
+
         canvas {
             border-radius: 50%;
         }
@@ -34,6 +46,10 @@
             margin: 5px;
             font-size: 16px;
         }
+
+        #clearButton {
+            margin-left: 10px; /* Space between buttons */
+        }
     </style>
 </head>
 <body>
@@ -43,7 +59,9 @@
         <input type="text" id="username" placeholder="Enter username">
         <button onclick="addUser()">Add</button>
         <button onclick="spinWheel()">Spin</button>
+        <button id="clearButton" onclick="clearWheel()">Clear</button> <!-- Clear button -->
     </div>
+    <div id="arrow"></div>
 
     <script>
         const canvas = document.getElementById("wheel");
@@ -118,8 +136,8 @@
             let currentRotation = (rotation * Math.PI / 180) % (2 * Math.PI);
             if (currentRotation < 0) currentRotation += 2 * Math.PI;
 
-            // Calculate the section the wheel stops at
-            let winningIndex = Math.floor(((Math.PI / 2) - currentRotation) / arc) % sections;
+            // Calculate the section on top of the wheel
+            let winningIndex = Math.floor((currentRotation - Math.PI / 2) / arc) % sections;
             if (winningIndex < 0) winningIndex += sections; // Fix negative index
             let winner = users[winningIndex] || "No name";
 
@@ -145,6 +163,13 @@
                 addUser();
             }
         });
+
+        // Clear button function
+        function clearWheel() {
+            users = []; // Empty out the users array
+            drawWheel(); // Redraw the empty wheel
+            document.getElementById("winnerDisplay").innerText = "Spin the wheel!"; // Reset winner display
+        }
 
         drawWheel();
     </script>

@@ -20,6 +20,18 @@
             margin-bottom: 10px;
         }
 
+        /* Arrow now positioned at the bottom */
+        #arrow {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 20px solid red;  /* Arrow pointing upwards (positioned at bottom) */
+            margin-top: -5px;
+            position: absolute;
+            top: 270px; /* Bottom of the wheel */
+        }
+
         canvas {
             border-radius: 50%;
         }
@@ -44,6 +56,7 @@
         <button onclick="addUser()">Add</button>
         <button onclick="spinWheel()">Spin</button>
     </div>
+    <div id="arrow"></div>
 
     <script>
         const canvas = document.getElementById("wheel");

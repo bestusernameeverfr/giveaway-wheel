@@ -3,122 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Username Wheel</title>
+    <title>Spinning Wheel</title>
     <style>
-        body { text-align: center; font-family: Arial, sans-serif; }
-        #wheelCanvas { margin-top: 20px; background: white; }
-        input, button { margin: 10px; padding: 10px; font-size: 16px; }
-        #wheelContainer { display: flex; justify-content: center; margin-top: 20px; }
-        #message { font-size: 18px; margin-top: 20px; font-weight: bold; color: #333; }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: white;
+        }
+
+        canvas {
+            border-radius: 50%;
+        }
+
+        #controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
-
-    <h2>Add Username</h2>
-    <input type="text" id="usernameInput" placeholder="Enter username">
-    <button onclick="addUsername()">Submit</button>
-
-    <div id="wheelContainer">
-        <canvas id="wheelCanvas" width="400" height="400"></canvas>
+    <canvas id="wheel" width="300" height="300"></canvas>
+    <div id="controls">
+        <input type="text" id="username" placeholder="Enter username">
+        <button onclick="addUser()">Add</button>
+        <button onclick="spinWheel()">Spin</button>
     </div>
 
-    <button onclick="spinWheel()">Spin</button>
-
-    <p id="message"></p>
-
     <script>
-        const canvas = document.getElementById("wheelCanvas");
+        const canvas = document.getElementById("wheel");
         const ctx = canvas.getContext("2d");
-        let usernames = [];
+        let users = [];
+        let rotation = 0;
         let spinning = false;
-        let currentAngle = 0;
-        const messageBox = document.getElementById("message");
-        
-        // Rainbow colors for the wheel sections
-        const colors = ["#FF0000", "#FF7F00", "#FFFF00", "#00FF00", "#0000FF", "#4B0082", "#8B00FF"];
-
-        function addUsername() {
-            const input = document.getElementById("usernameInput");
-            const username = input.value.trim();
-
-            if (!username) {
-                messageBox.textContent = "Username cannot be empty!";
-                return;
-            }
-
-            if (usernames.includes(username)) {
-                messageBox.textContent = "Username already added!";
-                return;
-            }
-
-            usernames.push(username);
-            input.value = "";
-            messageBox.textContent = ""; // Clear message
-            drawWheel();
-        }
 
         function drawWheel() {
-            if (usernames.length === 0) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                return;
-            }
+            const sections = users.length || 1;
+            const arc = (2 * Math.PI) / sections;
 
-            const numSegments = usernames.length;
-            const sliceAngle = (2 * Math.PI) / numSegments;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            for (let i = 0; i < numSegments; i++) {
-                const angle = currentAngle + i * sliceAngle;
-                
-                // Draw the wheel slices
+            for (let i = 0; i < sections; i++) {
                 ctx.beginPath();
-                ctx.moveTo(200, 200);
-                ctx.arc(200, 200, 200, angle, angle + sliceAngle);
-                ctx.fillStyle = colors[i % colors.length]; // Apply rainbow colors
+                ctx.moveTo(150, 150);
+                ctx.arc(150, 150, 150, arc * i, arc * (i + 1));
+                ctx.fillStyle = `hsl(${(i * 360) / sections}, 100%, 50%)`;
                 ctx.fill();
                 ctx.stroke();
+                ctx.closePath();
 
-                // Draw the text
                 ctx.save();
-                ctx.fillStyle = "black";
-                ctx.translate(200 + Math.cos(angle + sliceAngle / 2) * 120, 200 + Math.sin(angle + sliceAngle / 2) * 120);
-                ctx.rotate(angle + sliceAngle / 2);
-                ctx.textAlign = "center";
+                ctx.translate(150, 150);
+                ctx.rotate(arc * i + arc / 2);
+                ctx.textAlign = "right";
                 ctx.font = "16px Arial";
-                ctx.fillText(usernames[i], 0, 0);
+                ctx.fillStyle = "white";
+                ctx.fillText(users[i] || "?", 140, 5);
                 ctx.restore();
             }
         }
 
         function spinWheel() {
-            if (spinning || usernames.length === 0) {
-                messageBox.textContent = "Add usernames before spinning!";
-                return;
-            }
-
+            if (spinning || users.length === 0) return;
             spinning = true;
-            let spinTime = Math.random() * 3000 + 2000;
-            let startTime = null;
+            let angle = 0;
+            const spinSpeed = Math.random() * 10 + 10;
+            const deceleration = 0.98;
 
-            function animateWheel(timestamp) {
-                if (!startTime) startTime = timestamp;
-                let elapsed = timestamp - startTime;
+            function animate() {
+                angle = angle * deceleration + spinSpeed;
+                rotation += angle;
+                ctx.clearRect(0, 0, 300, 300);
+                ctx.save();
+                ctx.translate(150, 150);
+                ctx.rotate(rotation * Math.PI / 180);
+                ctx.translate(-150, -150);
+                drawWheel();
+                ctx.restore();
 
-                if (elapsed < spinTime) {
-                    currentAngle += 0.1 * (spinTime - elapsed) / 100;
-                    drawWheel();
-                    requestAnimationFrame(animateWheel);
+                if (angle > 0.1) {
+                    requestAnimationFrame(animate);
                 } else {
                     spinning = false;
-                    let selectedIndex = Math.floor((currentAngle / (2 * Math.PI)) * usernames.length) % usernames.length;
-                    messageBox.textContent = "Winner: " + usernames[selectedIndex];
                 }
             }
 
-            requestAnimationFrame(animateWheel);
+            animate();
         }
-    </script>
 
+        function addUser() {
+            const input = document.getElementById("username");
+            if (input.value.trim()) {
+                users.push(input.value.trim());
+                input.value = "";
+                drawWheel();
+            }
+        }
+
+        drawWheel();
+    </script>
 </body>
 </html>

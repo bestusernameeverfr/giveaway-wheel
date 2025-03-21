@@ -20,15 +20,14 @@
             margin-bottom: 10px;
         }
 
-        /* Arrow now correctly pointing downward */
+        /* Arrow now correctly positioned above the wheel */
         #arrow {
             width: 0;
             height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-top: 20px solid red;
-            position: absolute;
-            top: 90px;
+            border-bottom: 20px solid red;  /* Arrow pointing down */
+            margin-bottom: -5px;
         }
 
         canvas {
@@ -130,7 +129,7 @@
             let currentRotation = (rotation * Math.PI / 180) % (2 * Math.PI);
             if (currentRotation < 0) currentRotation += 2 * Math.PI;
 
-            // Calculate the winning section based on the arrow position
+            // Calculate the winning section based on the arrow's position
             let winningIndex = Math.floor(((Math.PI / 2) - currentRotation) / arc) % sections;
             if (winningIndex < 0) winningIndex += sections; // Fix negative index
             let winner = users[winningIndex] || "No name";

@@ -3,175 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spinning Wheel</title>
+    <title>Random Username Selector</title>
     <style>
         body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+        .box {
+            width: 300px;
+            height: 100px;
+            border: 2px solid #333;
+            display: flex;
             justify-content: center;
-            height: 100vh;
-            background: white;
+            align-items: center;
+            margin-bottom: 20px;
+            background-color: white;
         }
-
-        #winnerDisplay {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 10px;
+        .button-container {
+            display: flex;
+            margin-top: 10px;
         }
-
-        /* Arrow now positioned at the bottom */
-        #arrow {
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 20px solid red;  /* Arrow pointing upwards (positioned at bottom) */
-            margin-top: -5px;
-            position: absolute;
-            top: 270px; /* Bottom of the wheel */
+        .input-box {
+            width: 200px;
+            padding: 8px;
+            margin-right: 10px;
         }
-
-        canvas {
-            border-radius: 50%;
-        }
-
-        #controls {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        input, button {
-            padding: 10px;
-            margin: 5px;
+        .roll-btn {
+            padding: 10px 20px;
             font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
         }
-
-        #clearButton {
-            margin-left: 10px; /* Space between buttons */
+        .roll-btn:hover {
+            background-color: #45a049;
+        }
+        .stats {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .stats span {
+            margin-right: 10px;
+        }
+        .username-list {
+            margin-top: 10px;
+            text-align: left;
         }
     </style>
 </head>
 <body>
-    <div id="winnerDisplay">Spin the wheel!</div>
-    <canvas id="wheel" width="300" height="300"></canvas>
-    <div id="controls">
-        <input type="text" id="username" placeholder="Enter username">
-        <button onclick="addUser()">Add</button>
-        <button onclick="spinWheel()">Spin</button>
-        <button id="clearButton" onclick="clearWheel()">Clear</button> <!-- Clear button -->
+    <div class="container">
+        <div class="box" id="username-box">No Usernames</div>
+        <div class="button-container">
+            <input type="text" id="username-input" class="input-box" placeholder="Enter username" />
+            <button class="roll-btn" onclick="rollUsername()">Roll</button>
+        </div>
+        <div class="stats">
+            <span id="username-count">0</span> Usernames Entered
+        </div>
+        <div class="username-list" id="username-list"></div>
     </div>
-    <div id="arrow"></div>
 
     <script>
-        const canvas = document.getElementById("wheel");
-        const ctx = canvas.getContext("2d");
-        let users = ["", "", "", ""]; // Start with 4 empty slots
-        let rotation = 0;
-        let spinning = false;
+        let usernames = [];
 
-        function drawWheel() {
-            const sections = users.length;
-            const arc = (2 * Math.PI) / sections;
-
-            for (let i = 0; i < sections; i++) {
-                ctx.beginPath();
-                ctx.moveTo(150, 150);
-                ctx.arc(150, 150, 150, arc * i, arc * (i + 1));
-                ctx.fillStyle = `hsl(${(i * 360) / sections}, 100%, 50%)`;
-                ctx.fill();
-                ctx.stroke();
-                ctx.closePath();
-
-                ctx.save();
-                ctx.translate(150, 150);
-                ctx.rotate(arc * i + arc / 2);
-                ctx.textAlign = "right";
-                ctx.font = "16px Arial";
-                ctx.fillStyle = "white";
-                ctx.fillText(users[i] || "?", 140, 5);
-                ctx.restore();
-            }
-        }
-
-        function spinWheel() {
-            if (spinning || users.every(name => name === "")) return;
-            spinning = true;
-            let spinSpeed = 30; // Initial fast spin
-            let spinTime = 0;
-            const maxSpinTime = 6000; // 6 seconds total
-            const slowDownTime = 2000; // Last 2 seconds for slowing down
-
-            function animate(timestamp) {
-                if (!spinTime) spinTime = timestamp;
-                let elapsed = timestamp - spinTime;
-
-                if (elapsed < maxSpinTime - slowDownTime) {
-                    rotation += spinSpeed; // Keep constant speed
-                } else if (elapsed < maxSpinTime) {
-                    spinSpeed *= 0.97; // Gradually slow down
-                    rotation += spinSpeed;
-                } else {
-                    spinning = false;
-                    pickWinner();
-                    return;
-                }
-
-                ctx.clearRect(0, 0, 300, 300);
-                ctx.save();
-                ctx.translate(150, 150);
-                ctx.rotate(rotation * Math.PI / 180);
-                ctx.translate(-150, -150);
-                drawWheel();
-                ctx.restore();
-                requestAnimationFrame(animate);
-            }
-
-            requestAnimationFrame(animate);
-        }
-
-        function pickWinner() {
-            const sections = users.length;
-            const arc = (2 * Math.PI) / sections;
-            let currentRotation = (rotation * Math.PI / 180) % (2 * Math.PI);
-            if (currentRotation < 0) currentRotation += 2 * Math.PI;
-
-            // Calculate the section on top of the wheel
-            let winningIndex = Math.floor((currentRotation - Math.PI / 2) / arc) % sections;
-            if (winningIndex < 0) winningIndex += sections; // Fix negative index
-            let winner = users[winningIndex] || "No name";
-
-            document.getElementById("winnerDisplay").innerText = `Winner: ${winner}`;
-        }
-
-        function addUser() {
-            const input = document.getElementById("username");
-            if (input.value.trim()) {
-                const emptyIndex = users.indexOf("");
-                if (emptyIndex !== -1) {
-                    users[emptyIndex] = input.value.trim();
-                } else {
-                    users.push(input.value.trim());
-                }
-                input.value = "";
-                drawWheel();
-            }
-        }
-
-        document.getElementById("username").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                addUser();
+        // Handle username input and submission on Enter key
+        document.getElementById('username-input').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addUsername();
             }
         });
 
-        // Clear button function
-        function clearWheel() {
-            users = []; // Empty out the users array
-            drawWheel(); // Redraw the empty wheel
-            document.getElementById("winnerDisplay").innerText = "Spin the wheel!"; // Reset winner display
+        // Add username to the list
+        function addUsername() {
+            const input = document.getElementById('username-input');
+            const username = input.value.trim();
+            if (username) {
+                usernames.push(username);
+                input.value = '';
+                updateUsernameCount();
+                updateUsernameList();
+            }
         }
 
-        drawWheel();
+        // Update the count of usernames entered
+        function updateUsernameCount() {
+            document.getElementById('username-count').innerText = usernames.length;
+        }
+
+        // Update the displayed list of usernames
+        function updateUsernameList() {
+            const listElement = document.getElementById('username-list');
+            listElement.innerHTML = usernames.map(username => `<div>${username}</div>`).join('');
+        }
+
+        // Function to roll/select a random username
+        function rollUsername() {
+            if (usernames.length > 0) {
+                let randomIndex = Math.floor(Math.random() * usernames.length);
+                document.getElementById('username-box').innerText = usernames[randomIndex];
+            }
+        }
     </script>
 </body>
 </html>
